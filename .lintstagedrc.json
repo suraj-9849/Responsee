@@ -8,4 +8,4 @@
       "prettier --write"
     ],
     "*.scss": "prettier --write"
-  }
+    }
