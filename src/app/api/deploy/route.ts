@@ -1,3 +1,0 @@
-export funnction GET(){
-
-}

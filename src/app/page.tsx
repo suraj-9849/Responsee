@@ -1,101 +1,141 @@
-import Image from "next/image";
+'use client';
+import React, { useState } from 'react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Loader2, Github, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Separator } from '@/components/ui/separator';
+
+interface responsee {
+  id: string;
+  modifiedContent: string;
+  processedFiles: string[];
+  error?: string;
+}
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [githubUrl, setGithubUrl] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [response, setResponse] = useState<responsee | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+  const handleGenerate = async () => {
+    setIsLoading(true);
+    setResponse(null);
+    setError(null);
+
+    try {
+      const res = await fetch('/api/automate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ repoURL: githubUrl }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'An unknown error occurred');
+      }
+
+      setResponse(data);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : 'An unknown error occurred'
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className='container mx-auto max-w-4xl p-4'>
+      <Card className='w-full'>
+        <CardHeader>
+          <CardTitle className='flex items-center'>
+            <Github className='mr-2' /> Responsee
+          </CardTitle>
+          <CardDescription>
+            Input a GitHub repository URL to generate and modify style files
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className='mb-4 flex space-x-2'>
+            <Input
+              placeholder='Enter GitHub repository URL'
+              value={githubUrl}
+              onChange={(e) => setGithubUrl(e.target.value)}
+              disabled={isLoading}
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+            <Button onClick={handleGenerate} disabled={isLoading || !githubUrl}>
+              {isLoading ? (
+                <>
+                  <Loader2 className='mr-2 h-4 w-4 animate-spin' /> Generating
+                </>
+              ) : (
+                'Generate'
+              )}
+            </Button>
+          </div>
+
+          {error && (
+            <Alert variant='destructive' className='mb-4'>
+              <AlertCircle className='h-4 w-4' />
+              <AlertTitle>Error</AlertTitle>
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
+          {response && (
+            <Tabs defaultValue='summary' className='w-full'>
+              <TabsList className='grid w-full grid-cols-2'>
+                <TabsTrigger value='summary'>Summary</TabsTrigger>
+                <TabsTrigger value='content'>Modified Content</TabsTrigger>
+              </TabsList>
+              <TabsContent value='summary'>
+                <Card>
+                  <CardContent className='space-y-2 p-6'>
+                    <div className='flex items-center space-x-2'>
+                      <CheckCircle2 className='text-green-500' />
+                      <span>Processing Session ID: {response.id}</span>
+                    </div>
+                    <Separator />
+                    <div>
+                      <h3 className='font-semibold'>Processed Files:</h3>
+                      <ul className='list-inside list-disc text-sm text-muted-foreground'>
+                        {response.processedFiles.map((file, index) => (
+                          <li key={index}>{file}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+              <TabsContent value='content'>
+                <Card>
+                  <CardContent className='p-0'>
+                    <ScrollArea className='h-[300px] w-full rounded-md border p-4'>
+                      <pre className='font-mono text-xs'>
+                        {response.modifiedContent}
+                      </pre>
+                    </ScrollArea>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
