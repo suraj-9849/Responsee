@@ -10,8 +10,8 @@ const s3 = new S3Client({
   credentials: fromEnv(),
 });
 
-// filename :  output/12ge5/src/App.jsx
-//LocalFilePath:User/Suraj/Vercel/output/12ge5/src/App.jsx
+// filename :  repositories/12ge5/src/App.jsx
+//LocalFilePath:User/Suraj/responsee/repositories/12ge5/src/App.jsx
 
 // so we want to store the data in the form of the fileName like structure in the CloudFlare rather than the localFilePath
 
