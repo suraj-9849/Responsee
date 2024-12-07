@@ -1,7 +1,6 @@
 import { generate } from '../utils'; //It Generates New A random ID
 import simpleGit from 'simple-git'; // used to write the git commands in the NODEJS
 import path from 'path';
-import os from 'os';
 import { getAllFiles } from '../file';
 import { uploadFile } from '../aws';
 import { modifyFileContent } from '../gptAPI';
@@ -31,8 +30,8 @@ export async function POST(req: NextRequest) {
   const id = generate();
 
   // using os.tmpdir() for more reliable temporary directory creation
-  const tempDir = path.join(os.tmpdir(), `repositories/${id}`);
-
+  const tempDir = path.join(__dirname, `repositories/${id}`);
+  console.log(tempDir);
   try {
     // Ensure the parent directories exist
     await fsPromises.mkdir(tempDir, {
