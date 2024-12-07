@@ -1,6 +1,7 @@
 import { generate } from '../utils'; //It Generates New A random ID
 import simpleGit from 'simple-git'; // used to write the git commands in the NODEJS
 import path from 'path';
+import os from 'os';
 import { getAllFiles } from '../file';
 import { uploadFile } from '../aws';
 import { modifyFileContent } from '../gptAPI';
@@ -29,10 +30,12 @@ export async function POST(req: NextRequest) {
   // console.log('Received Repository URL: ', repoURL);
   const id = generate();
 
-  const tempDir = path.join(process.cwd(), `repositories/${id}`);
+  // using os.tmpdir() for more reliable temporary directory creation
+  const tempDir = path.join(os.tmpdir(), `repositories/${id}`);
 
   try {
-    await fsPromises.mkdir(path.join(process.cwd(), 'repositories'), {
+    // Ensure the parent directories exist
+    await fsPromises.mkdir(tempDir, {
       recursive: true,
     });
 
@@ -72,7 +75,6 @@ export async function POST(req: NextRequest) {
 
       const modifiedContent = await modifyFileContent(fileContent);
       console.log('Modified content for', file);
-
       allModifiedContent += `/* Content of ${path.basename(file)} */\n${modifiedContent}\n\n`;
     }
 
@@ -87,6 +89,7 @@ export async function POST(req: NextRequest) {
       { status: 500 }
     );
   }
+
   // we will return the id, The Processed Files and Modified Content to the frontend
   return NextResponse.json({
     id,
